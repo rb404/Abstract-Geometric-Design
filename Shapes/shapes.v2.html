@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://unpkg.com/konva@4.0.12/konva.min.js"></script>
+    <script src="colors.js"></script>
+    <meta charset="utf-8" />
+    <title>Shape Builder Demo</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container"></div>
+    <script>
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+
+        var stage = new Konva.Stage({
+            container: 'container',
+            width: width,
+            height: height
+        });
+
+        var layer1 = new Konva.Layer();
+        var layer2 = new Konva.Layer();
+        var base = new Konva.Layer();
+
+        // add the layer to the stage
+        stage.add(base);
+        stage.add(layer1);
+        stage.add(layer2);
+        
+        
+        var colorSet = getColorSet();
+
+        var focalX = getRndInteger(1000, 1760);
+        var focal = new Konva.Rect({
+            x: focalX,
+            y: -200,
+            width: 200,
+            height: 1800,
+            fill: getColor(colorSet),
+            //fill: "red",
+            draggable: true,
+            opacity: 1,
+            name: 'shape'
+        });
+        base.add(focal);
+        focal.rotate(45);
+
+        var smallSquares = getRndInteger(10, 25);
+        var smallRandX = getRndInteger(200, 500);
+        var smallRandY = getRndInteger(200, 500);
+
+        for (var i = 0; i < smallSquares; i++) {
+
+
+            if (smallRandX < 0 || smallRandX > 1760) {
+                smallRandX = getRndInteger(0, 1760);
+            }
+            if (smallRandY < 0 || smallRandY > 800) {
+                smallRandY = getRndInteger(0, 800);
+            }
+            var rect = new Konva.Rect({
+                //x: getRndInteger(0, 1760),
+                //y: getRndInteger(0, 800),
+                x: smallRandX,
+                y: smallRandY,
+                width: 150,
+                height: 150,
+                fill: getColor(colorSet),
+                draggable: true,
+                opacity: 0.5,
+                name: 'shape',
+                //globalCompositeOperation: 'xor'
+            });
+            smallRandX = getRndInteger(smallRandX - 300, smallRandX + 500);
+            smallRandY = getRndInteger(smallRandY - 300, smallRandY + 500);
+            layer1.add(rect);
+            rect.rotate(45);
+        }
+
+        var bigRandX = getRndInteger(500, 1000);
+        var bigRandY = getRndInteger(-200, 700);
+
+        for (var i = 0; i < smallSquares / 3; i++) {
+            if (bigRandX < 500 || bigRandX > 1400) {
+                bigRandY = getRndInteger(-200, 1400);
+            }
+            if (bigRandY < 100 || bigRandY > 1200) {
+                bigRandY = getRndInteger(-200, 1000);
+            }
+            var rect = new Konva.Rect({
+                x: getRndInteger(500, 1500),
+                //y: getRndInteger(0, 700),
+                //x: bigRandX,
+                y: bigRandY,
+                width: 80,
+                height: 1000,
+                fill: getColor(colorSet),
+                draggable: true,
+                opacity: .5,
+                name: 'shape',
+                //globalCompositeOperation: 'xor'
+            });
+            bigRandX = getRndInteger(bigRandX - 300, bigRandX + 500);
+            bigRandY = getRndInteger(-200, bigRandY + 500);
+
+            layer2.add(rect);
+            rect.rotate(45);
+        }
+
+        stage.on('mouseover', function (e) {
+            if (e.target.hasName('shape')) {
+                document.body.style.cursor = 'pointer';
+            }
+            else {
+                this.opacity(1);
+                base.draw();
+                layer1.draw();
+                layer2.draw();
+                document.body.style.cursor = 'default';
+            }
+        });
+
+        stage.on('click tap', function (e) {
+            // if click on empty area - remove all transformers
+            if (e.target === stage) {
+                stage.find('Transformer').destroy();
+                base.draw();
+                layer1.draw();
+                layer2.draw();
+                
+                return;
+            }
+            // do nothing if clicked NOT on our rectangles
+            if (!e.target.hasName('shape')) {
+                return;
+            }
+            // remove old transformers
+            // TODO: we can skip it if current rect is already selected
+            stage.find('Transformer').destroy();
+
+            // create new transformer
+            var tr = new Konva.Transformer();
+            base.add(tr);
+            layer1.add(tr);
+            layer2.add(tr);
+            
+
+            tr.attachTo(e.target);
+
+            base.draw();
+            layer1.draw();
+            layer2.draw();
+            
+        });
+
+        base.draw()
+        layer1.draw()
+        layer2.draw()
+        
+
+    </script>
+</body>
+
+</html>
